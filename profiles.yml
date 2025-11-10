@@ -1,0 +1,12 @@
+dbt_postgres:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: host.docker.internal
+      user: postgres
+      password: postgres
+      port: 5432
+      dbname: banco_postgres
+      schema: public
+      threads: 4

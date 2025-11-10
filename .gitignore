@@ -1,0 +1,25 @@
+# Virtual environments
+venv_postgres/
+venv/
+.env
+
+# DBT build artifacts
+target/
+dbt_packages/
+logs/
+.venv/
+dbt_modules/
+
+# System / cache
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/
+.idea/

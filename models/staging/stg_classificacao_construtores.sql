@@ -9,6 +9,7 @@ SELECT
     {{ string_field('raceId', int_format=True) }} AS id_corrida,
     {{ string_field('constructorId', int_format=True) }} AS id_equipe,
     points AS pontos,
+    position AS posicao_int,
     "positionText" AS posicao,
     wins AS vitorias
 FROM {{ ref('constructor_standings') }}

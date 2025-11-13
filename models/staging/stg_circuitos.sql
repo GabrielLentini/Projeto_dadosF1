@@ -4,7 +4,7 @@
     tags=['local']
 ) }}
 
-SELECT 
+SELECT
     {{ string_field('circuitId', int_format=True) }} AS id_circuito,
     {{ replace_diacritics("name") }} AS nome_circuito,
     {{ replace_diacritics("circuitRef") }} AS nome_circuito_abreviado,

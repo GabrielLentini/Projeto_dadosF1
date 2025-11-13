@@ -1,0 +1,38 @@
+[sqlfluff]
+dialect=postgres
+templater=dbt
+exclude_rules=CP02,references.special_chars
+max_line_length=120
+processes=-1
+# Ignora cláusulas de comentários ao verificar o comprimento das linhas.
+ignore_comment_clauses=true
+large_file_skip_byte_limit = 30000
+[sqlfluff:rules]
+# Desativa a regra que exige que identificadores (colunas, tabelas, etc.) sigam PascalCase.
+CP02=none
+
+# Enforce o alinhamento consistente, garantindo que a indentação esteja correta.
+L003=enforce  # Manter o alinhamento consistente, mas sem quebras desnecessárias
+
+# Enforce a indentação e o fechamento adequado de blocos, como colchetes e parênteses.
+L016=enforce  # Enforce indentação consistente e layout de fechamento de colchetes
+
+# Desativa a regra que posiciona vírgulas (não haverá imposição sobre o posicionamento).
+LT04=none
+
+# Enforce o uso consistente de alias em colunas e tabelas.
+L014=enforce  # Enforce alias consistente para colunas
+
+# Permite o uso de alias em uma única coluna, como `SELECT coluna AS alias`.
+L014.allow_single_column_alias=True  # Permite alias com uma única coluna como "element"
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = consistent
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = consistent
+
+[sqlfluff:indentation]
+tab_space_size = 4
+
+cache = true

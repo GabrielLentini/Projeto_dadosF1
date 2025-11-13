@@ -12,7 +12,7 @@ SELECT
     {{ string_field('statusId', int_format=True) }} AS id_status,
     REPLACE({{ string_field('number') }}, '\N', '(N/A)') AS numero_piloto,
     grid AS posicao_largada,
-    "positionText" AS posicao,    
+    "positionText" AS posicao,
     points AS pontos,
     laps AS voltas_concluidas,
     REPLACE(time, '\N', '(N/A)') AS tempo_conclusao_corrida,

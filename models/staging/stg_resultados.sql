@@ -10,7 +10,7 @@ SELECT
     {{ string_field('driverId', int_format=True) }} AS id_piloto,
     {{ string_field('constructorId', int_format=True) }} AS id_equipe,
     {{ string_field('statusId', int_format=True) }} AS id_status,
-    REPLACE({{ string_field('number') }}, '\N', '(N/A)') AS numero_piloto,
+    {{ string_field('number') }} AS numero_piloto,
     grid AS posicao_largada,
     "positionText" AS posicao,
     points AS pontos,

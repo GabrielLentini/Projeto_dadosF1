@@ -6,7 +6,7 @@
 
 SELECT
     {{ string_field('driverId', int_format=True) }} AS id_piloto,
-    REPLACE({{ string_field('number') }}, '\N', '(N/A)') AS numero_piloto,
+    {{ string_field('number') }} AS numero_piloto,
     {{ replace_diacritics("code") }} AS abreviacao_piloto,
     {{ replace_diacritics("forename") }} AS primeiro_nome_piloto,
     {{ replace_diacritics("surname") }} AS sobrenome_piloto,

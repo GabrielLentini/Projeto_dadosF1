@@ -15,7 +15,7 @@ SELECT
     REPLACE(fp1_date, '\N', '0001-01-01') AS data_treino_livre_um,
     REPLACE(fp2_date, '\N', '0001-01-01') AS data_treino_livre_dois,
     REPLACE(fp3_date, '\N', '0001-01-01') AS data_treino_livre_tres,
-    REPLACE(fp1_time, '\N', '(N/A)') AS horario_treino_livre_um,
-    REPLACE(fp2_time, '\N', '(N/A)') AS horario_treino_livre_dois,
-    REPLACE(fp3_time, '\N', '(N/A)') AS horario_treino_livre_tres
+    {{ string_field('fp1_time') }} AS horario_treino_livre_um,
+    {{ string_field('fp2_time') }} AS horario_treino_livre_dois,
+    {{ string_field('fp3_time') }} AS horario_treino_livre_tres
 FROM {{ ref('races') }}

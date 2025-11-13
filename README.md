@@ -1,15 +1,14 @@
-Welcome to your new dbt project!
+# Bem-vindo ao Repositório `DBT_POSTGRES`
 
-### Using the starter project
+Repositorio que desempenham a transformação e manutenção das tabelas do banco de dados, passando pelas camadas staging, intermediate e
+marts, contendo dimensões e fatos.
 
-Try running the following commands:
-- dbt run
-- dbt test
+## Utilizando este Projeto
 
+Para utilizar este projeto voce deverá seguir as seguintes etapas:
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+- `Iniciação do venv` (para ativar máquina virtual)
+- `dbt deps` (para instalar as dependências do repositório)
+- `dbt seed` (para importar os CSVs para tabela)
+- `dbt run` (para executar os modelos)
+- `dbt test` (para executar os testes)

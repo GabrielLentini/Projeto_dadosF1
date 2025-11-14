@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: dim_pilotos
+    description: >
+      Dimensão de pilotos construída segundo o modelo de Kimball.
+      Esta tabela representa uma dimensão conformada, contendo atributos descritivos e
+      históricos relacionados aos pilotos da Fórmula 1. Seu objetivo é fornecer uma visão
+      consolidada e enriquecida dos pilotos, permitindo análises no contexto de um Data Warehouse
+      e suportando informações sobre corridas, temporadas, classificações e desempenho ao longo da carreira.
+
+      No modelo dimensional de Kimball, as tabelas dimensão descrevem entidades — como pessoas,
+      produtos, datas ou locais — com atributos textuais, categóricos e semânticos úteis para
+      análise. A dim_pilotos cumpre esse papel ao centralizar informações descritivas dos pilotos,
+      combinando dados de performance (como vitórias e títulos) com dados pessoais (idade,
+      nacionalidade, nome completo).
+
+      Esta dimensão utiliza uma chave substituta (id_dim_pilotos) gerada através de hashing, o que
+      segue as boas práticas de modelagem dimensional para garantir independência da chave natural e
+      estabilidade ao longo do tempo.
+
+      Lógica do Modelo:
+      A dim_pilotos integra informações de múltiplas camadas:
+        - int_dados_pilotos: métricas agregadas de performance na carreira (pontos, vitórias, pódios, etc.).
+        - int_titulos_pilotos: quantidade total de títulos identificada com base em regras históricas.
+        - stg_pilotos: dados cadastrais e identificadores naturais dos pilotos.
+      A junção desses datasets permite criar uma dimensão rica e completa sobre pilotos e suas carreiras na Fórmula 1.
+
+    columns:
+      - name: id_dim_pilotos
+        description: "Identificador único da dimensão (chave substituta gerada por hash)."
+
+      - name: id_piloto
+        description: "Identificador natural do piloto, proveniente das fontes originais."
+
+      - name: nome_piloto
+        description: "Nome completo do piloto."
+
+      - name: abreviacao_piloto
+        description: "Abreviação oficial utilizada para o piloto nas corridas."
+
+      - name: pontos_totais_carreira
+        description: "Total de pontos acumulados pelo piloto ao longo de sua carreira."
+
+      - name: titulos
+        description: "Quantidade total de campeonatos conquistados pelo piloto."
+
+      - name: vitorias
+        description: "Número total de vitórias do piloto."
+
+      - name: podios
+        description: "Número total de vezes que o piloto terminou em 1º, 2º ou 3º lugar."
+
+      - name: pole_positions
+        description: "Quantidade de pole positions conquistadas ao longo da carreira."
+
+      - name: largadas_top10
+        description: "Número de corridas em que o piloto largou dentro das 10 primeiras posições."
+
+      - name: largadas_fora_top10
+        description: "Número de corridas em que o piloto largou em posições superiores a 10."
+
+      - name: nacionalidade_piloto
+        description: "Nacionalidade do piloto."
+
+      - name: data_nascimento_piloto
+        description: "Data de nascimento do piloto."

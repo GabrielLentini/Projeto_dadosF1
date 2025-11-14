@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: int_dados_pilotos
+    description: "Tabela intermediária que consolida as estatísticas gerais da carreira de cada piloto.
+      O modelo agrega pontos obtidos em corridas e sprints, além de computar métricas de desempenho
+      como vitórias, pódios, pole positions e posições de largada. Cada linha representa um piloto,
+      contendo o resumo de sua performance em todas as corridas registradas no dataset. No código nós
+      fazemos um group by utilizando o id_piloto, agrupando as informações por piloto. Para somarmos tanto
+      os pontos utilizados em corrida sprint quanto em corridas principais utilizamos a função SUM, com coalesce
+      para evitar que fique como NULL. Também é utilizada algumas vezes a função COUNT, para contarmos os valores
+      baseado no que está dentro do filtro determinado em filter."
+    columns:
+      - name: id_piloto
+        description: "Identificador único do piloto."
+      - name: pontos_totais_carreira
+        description: "Soma total dos pontos conquistados pelo piloto em toda a carreira."
+      - name: vitorias
+        description: "Número total de vitórias do piloto."
+      - name: podios
+        description: "Número total de pódios do piloto."
+      - name: pole_positions
+        description: "Quantidade de pole positions do piloto."
+      - name: largadas_top10
+        description: "Número de vezes que o piloto largou dentro do top 10."
+      - name: largadas_fora_top10
+        description: "Quantidade de vezes que o piloto largou fora do top 10."
+
+
+  - name: int_titulos_pilotos
+    description: "Este modelo calcula a quantidade total de títulos de cada piloto da Fórmula 1 ao longo de suas carreiras.
+      Ele aplica corretamente as regras históricas de pontuação vigentes em cada período, incluindo o sistema
+      antigo utilizado antes de 1990, que considerava apenas os 11 melhores resultados de cada piloto na temporada.
+      O objetivo principal da tabela é identificar, para cada ano, qual piloto foi campeão ao somar os pontos
+      válidos daquele período, e posteriormente contar quantas vezes cada piloto aparece como campeão ao longo
+      de todas as temporadas registradas.
+
+      Lógica geral do modelo
+      O cálculo é dividido em três etapas principais:
+      1. Pontuação por corrida
+      Cada linha representa uma corrida de um piloto, somando pontos de corrida e pontos de sprint quando existirem.
+      Também é atribuído um ranking das corridas por piloto em cada ano (1 = maior pontuação no ano), o que permite
+      aplicar corretamente a regra de descarte do sistema antigo.
+      2. Pontuação válida por ano
+      - Para anos anteriores ou iguais a 1990, apenas as 11 melhores corridas do piloto contam para o campeonato.
+        Esse era o sistema oficial da Fórmula 1 na época: mesmo que o piloto participasse de mais corridas, apenas
+        seus melhores resultados eram considerados.
+      - Para anos após 1990, todos os resultados passam a contar, pois a FIA encerrou o critério de descarte.
+      A tabela agrega a soma de pontos válidos por piloto e ano, respeitando essas diferenças entre os sistemas.
+      3. Identificação dos campeões e contagem de títulos
+      Para cada ano, o modelo precisa identificar qual piloto obteve a maior pontuação válida. A partir dessa identificação,
+      é possível determinar o campeão de cada temporada e, posteriormente, contar quantas vezes cada piloto foi campeão.
+      Para isso, é utilizado um SELECT DISTINCT ON (ano_corrida) ordenado por pontos_no_ano decrescente. Esse comando retorna
+      exatamente uma linha por ano, garantindo que o piloto com maior pontuação seja escolhido como campeão.
+      O uso do subselect é necessário porque o PostgreSQL não permite agrupar diretamente após um DISTINCT ON.  
+      Em outras palavras, o `DISTINCT ON` é aplicado antes da agregação, e o agrupamento externo (`GROUP BY id_piloto`) só pode
+      acontecer após o subconjunto de campeões por ano já estar definido.
+      Se tentássemos agrupar sem o subselect, o banco retornaria erro de sintaxe ou ambiguidades, porque DISTINCT ON escolhe uma linha por ano,
+      GROUP BY precisa ser aplicado sobre um conjunto já filtrado e não é possível contar títulos enquanto ainda existem múltiplas linhas por ano.
+      O subselect isola corretamente o resultado desejado (um campeão por ano), permitindo então que o `GROUP BY id_piloto`
+      conte quantas vezes cada piloto vence.
+      Assim, o subselect é fundamental para separar essas duas etapas: Selecionar o campeão de cada ano e agrupar por piloto e contar títulos
+
+      A tabela final contém uma linha por piloto, com o total de títulos (campeonatos) que esse piloto ganhou,
+      aplicando fielmente o sistema de pontuação vigente em cada época da Fórmula 1."
+      
+    columns:
+      - name: id_piloto
+        description: "Identificador único do piloto."
+      - name: titulos
+        description: "Quantidade de títulos."

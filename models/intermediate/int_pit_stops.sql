@@ -6,7 +6,7 @@
 
 SELECT
     pt.id_piloto,
-    c.ano_corrida,
+    c.ano_corrida AS ano,
     COUNT(*) AS numero_paradas
 FROM {{ ref('stg_pit_stops') }} AS pt
 LEFT JOIN {{ ref('stg_corridas') }} AS c

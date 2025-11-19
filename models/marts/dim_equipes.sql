@@ -1,7 +1,7 @@
 {{ config(
     unique_key='id_dim_pilotos',
     materialized='table',
-    tags=['pilotos']
+    tags=['construtores']
 ) }}
 
 SELECT

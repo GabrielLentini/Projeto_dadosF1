@@ -6,7 +6,7 @@
 
 --noqa:disable=LT05, CV11
 SELECT
-    {{ dbt_utils.generate_surrogate_key(['pc.id_piloto', 'pt.numero_paradas', 'pc.ano_campeonato']) }} AS id_estatisticas,
+    {{ dbt_utils.generate_surrogate_key(['pc.id_piloto', 'pt.numero_paradas', 'pc.ano_campeonato']) }} AS id_dim_estatisticas,
     pc.id_piloto,
     pc.ano_campeonato AS ano,
     COALESCE(pt.numero_paradas::text, '(N/A)') AS numero_paradas,
@@ -21,4 +21,4 @@ LEFT JOIN {{ ref('int_status') }} AS st
 LEFT JOIN {{ ref('int_pit_stops') }} AS pt
     ON
         pt.id_piloto = pc.id_piloto
-        AND pt.ano_corrida = pc.ano_campeonato
+        AND pt.ano = pc.ano_campeonato

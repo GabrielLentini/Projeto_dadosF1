@@ -20,4 +20,4 @@ LEFT JOIN {{ ref('stg_resultados') }} AS r
     ON r.id_status = st.id_status
 LEFT JOIN {{ ref('stg_corridas') }} AS c
     ON c.id_corrida = r.id_corrida
-GROUP BY c.ano_corrida, id_piloto
+GROUP BY c.ano_corrida, r.id_piloto

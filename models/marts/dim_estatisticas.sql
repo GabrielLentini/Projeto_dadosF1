@@ -4,6 +4,7 @@
     tags=['status', 'estatisticas']
 ) }}
 
+--noqa:disable=LT05, CV11
 SELECT
     {{ dbt_utils.generate_surrogate_key(['pc.id_piloto', 'pt.numero_paradas', 'pc.ano_campeonato']) }} AS id_estatisticas,
     pc.id_piloto,
@@ -14,8 +15,10 @@ SELECT
     pc.colocacao_no_campeonato
 FROM {{ ref('int_posicao_campeonato') }} AS pc
 LEFT JOIN {{ ref('int_status') }} AS st
-    ON pc.id_piloto = st.id_piloto
-    AND pc.ano_campeonato = st.ano_corrida
+    ON
+        pc.id_piloto = st.id_piloto
+        AND pc.ano_campeonato = st.ano_corrida
 LEFT JOIN {{ ref('int_pit_stops') }} AS pt
-    ON pt.id_piloto = pc.id_piloto
-    AND pt.ano_corrida = pc.ano_campeonato
+    ON
+        pt.id_piloto = pc.id_piloto
+        AND pt.ano_corrida = pc.ano_campeonato

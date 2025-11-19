@@ -13,8 +13,9 @@ WITH pontos_por_piloto AS (
     LEFT JOIN {{ ref('stg_corridas') }} AS c
         ON r.id_corrida = c.id_corrida
     LEFT JOIN {{ ref('stg_sprint') }} AS s
-        ON r.id_corrida = s.id_corrida
-        AND r.id_piloto = s.id_piloto
+        ON
+            r.id_corrida = s.id_corrida
+            AND r.id_piloto = s.id_piloto
     GROUP BY r.id_piloto, c.ano_corrida
 )
 

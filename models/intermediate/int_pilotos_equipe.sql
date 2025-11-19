@@ -6,9 +6,9 @@
 
 SELECT
     MAX(c.id_equipe) AS id_equipe,
-    jsonb_build_object(
+    JSONB_BUILD_OBJECT(
         c.nome_equipe,
-        jsonb_agg(DISTINCT jsonb_build_object(
+        JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT(
             'id_piloto', p.id_piloto,
             'nome_piloto', p.nome_piloto
         ))

@@ -1,0 +1,182 @@
+version: 2
+
+models:
+  - name: dim_corridas
+    description: "Dimensão de corridas construída segundo o modelo de Kimball.
+      Esta tabela representa uma dimensão conformada que consolida atributos históricos e descritivos de cada corrida da Fórmula 1. Seu objetivo é fornecer 
+      uma visão única e padronizada dos eventos, permitindo análises ao longo de diferentes temporadas, circuitos e desempenhos individuais, além de servir de base 
+      para fatos relacionados a resultados, pilotos e equipes.
+
+      No contexto do modelo dimensional, as tabelas dimensão descrevem entidades por meio de atributos textuais, categóricos e contextuais. A dim_corridas cumpre 
+      esse papel ao centralizar informações essenciais sobre cada prova — como circuito, ano, data, volta mais rápida e pilotos de destaque — fornecendo uma 
+      estrutura consistente para análises históricas e comparativos entre temporadas.
+
+      A tabela utiliza uma chave substituta (id_dim_corridas) gerada por hashing a partir de identificadores naturais da corrida e de seu respectivo resultado. 
+      Essa abordagem segue boas práticas de modelagem dimensional, garantindo estabilidade da chave, independência das chaves operacionais e robustez para evolução do modelo.
+
+      Lógica do Modelo:
+      A construção da dimensão integra dados de múltiplas camadas do pipeline:
+      stg_corridas: contém atributos estruturais da corrida, como ano, circuito e data.
+      stg_resultados: fornece dados de desempenho, incluindo volta mais rápida, voltas concluídas e tempos totais.
+      int_dados_corrida: agrega informações adicionais como os pilotos nas três primeiras posições e o pole position.
+      Como cada corrida pode possuir múltiplos registros de resultados, o modelo aplica funções de agregação para garantir um único registro por corrida, 
+      o que é coerente com sua função dimensional. O agrupamento final por id_corrida assegura que a dimensão traga exatamente uma linha por evento, 
+      consolidando todos os atributos relevantes em uma representação única e confiável."
+    columns:
+      - name: id_dim_corridas
+        description: "Identificador único da dimensão de corridas."
+      - name: id_corrida
+        description: "Identificador único da corrida."
+      - name: id_resultado
+        description: "Identificador único do resultado."
+      - name: ano_corrida
+        description: "Ano em que a corrida ocorreu."
+      - name: nome_circuito
+        description: "Nome oficial do circuito onde a corrida foi realizada."
+      - name: data_corrida
+        description: "Data da realização da corrida."
+      - name: tempo_conclusao_corrida
+        description: "Tempo total para conclusão da corrida. Caso piloto não tenha vencido é calculada a diferença pro tempo do vencedor."
+      - name: voltas_concluidas
+        description: "Número total de voltas completadas."
+      - name: tempo_volta_mais_rapida
+        description: "Tempo registrado da volta mais rápida da corrida."
+      - name: primeiro_colocado
+        description: "Nome do piloto que terminou em primeiro lugar."
+      - name: segundo_colocado
+        description: "Nome do piloto que terminou em segundo lugar."
+      - name: terceiro_colocado
+        description: "Nome do piloto que terminou em terceiro lugar."
+      - name: piloto_pole_position
+        description: "Piloto que largou na pole position."
+
+  - name: dim_equipes
+    description: "Dimensão de equipes construída segundo o modelo de Kimball. Esta tabela representa uma dimensão conformada que centraliza atributos históricos, 
+     descritivos e de desempenho das equipes da Fórmula 1. Seu objetivo é fornecer uma visão completa, estável e padronizada das escuderias ao longo das temporadas, 
+     permitindo análises sobre desempenho esportivo, evolução histórica, composição de pilotos e comparações entre construtores.
+
+      No modelo dimensional, as tabelas dimensão descrevem entidades com atributos textuais e categóricos que contextualizam fatos. A dim_equipes cumpre esse papel 
+      ao consolidar informações essenciais sobre cada equipe — como nome, nacionalidade, pilotos que já competiram pela escuderia e métricas agregadas de performance, 
+      incluindo vitórias, pódios, largadas e pontos totais acumulados na história.
+
+      A tabela utiliza uma chave substituta (id_dim_equipes) gerada via hashing a partir do identificador natural da equipe. Essa abordagem segue boas práticas de 
+      modelagem dimensional ao garantir independência da chave operacional e estabilidade mesmo diante de mudanças no sistema de origem.
+
+      Lógica do Modelo:
+      A dimensão integra dados provenientes de múltiplas camadas transformadas no pipeline:
+      int_dados_equipes: concentra métricas agregadas de performance da equipe ao longo da história, como pontos totais, vitórias, pódios, pole positions e estatísticas de largadas.
+      int_titulos_equipes: retorna a quantidade total de títulos conquistados pela equipe; seu valor é incorporado com tratamento para casos onde não há títulos registrados.
+      stg_construtores: oferece atributos descritivos, como nome oficial e nacionalidade da equipe, funcionando como base cadastral.
+      int_pilotos_equipe: consolida todos os pilotos que já competiram pela equipe, permitindo análises de composição histórica da escuderia.
+      Esses datasets são combinados por meio de junções utilizando id_equipe como chave natural. O resultado final é uma dimensão completa, unificada e de granularidade única por equipe, refletindo tanto atributos fixos (como nome e nacionalidade) quanto indicadores acumulados de desempenho."
+    columns:
+      - name: id_dim_equipes
+        description: "Identificador único da dimensão."
+      - name: id_equipe
+        description: "Identificador único da equipe"
+      - name: nome_equipe
+        description: "Nome da equipe."
+      - name: pontos_totais_equipe
+        description: "Total de pontos acumulados pelo equipe na história."
+      - name: vitorias
+        description: "Número total de vitórias da equipe."
+      - name: podios
+        description: "Número total de vezes que os pilotos da equipe terminaram em 1º, 2º ou 3º lugar."
+      - name: pole_positions
+        description: "Quantidade de pole positions conquistadas por pilotos da equipe."
+      - name: largadas_top10
+        description: "Número de corridas em que pilotos da equipe largaram dentro das 10 primeiras posições."
+      - name: largadas_fora_top10
+        description: "Número de corridas em que pilotos da equipe largaram em posições superiores a 10."
+      - name: nacionalidade_equipe
+        description: "Nacionalidade da equipe."
+      - name: pilotos_da_equipe
+        description: "Nome de todos pilotos que correram pelo menos uma corrida pela equipe."
+  
+  - name: dim_estatisticas
+    description: "Dimensão de estatísticas construída segundo o modelo de Kimball. Esta tabela consolida informações históricas e descritivas sobre o desempenho dos pilotos 
+      em cada temporada da Fórmula 1, funcionando como uma dimensão conformada que contextualiza fatos relacionados a posições no campeonato, número de pit stops e status 
+      esportivo ao longo do ano. Seu propósito é fornecer uma visão unificada, granular por piloto e temporada, permitindo análises mais ricas sobre consistência, estratégia 
+      de corrida, participação e evolução histórica.
+
+      No contexto dimensional, esta dimensão descreve atributos que variam ano a ano, capturando características relevantes para análises esportivas. A dim_estatisticas reúne 
+      dados como número de paradas nos boxes, colocação final na temporada e status do piloto. Esses atributos permitem que fatos relacionados a corridas ou temporadas sejam 
+      analisados sob diferentes perspectivas comportamentais e estratégicas.
+
+      A tabela utiliza uma chave substituta (id_dim_estatisticas) gerada por hashing a partir do piloto, do ano e do total de paradas — combinação que assegura granularidade 
+      consistente e independência das chaves naturais. Esse padrão segue as melhores práticas de modelagem dimensional, mantendo estabilidade e evitando dependência direta 
+      os sistemas transacionais.
+
+      Lógica do Modelo:
+      A dimensão integra três componentes principais:
+      int_posicao_campeonato: fornece a base da granularidade (piloto x ano), incluindo a colocação final no campeonato e o identificador natural do piloto.
+      int_status: adiciona o status do piloto em cada temporada, indicando participação e condições especiais ao longo do ano.
+      int_pit_stops: agrega o número de pit stops realizados na temporada, retornando tanto o valor inteiro quanto sua representação textual.
+
+      As junções utilizam sempre a combinação de id_piloto e ano, garantindo integridade entre os datasets. Há também tratamento explícito para valores falta"
+    columns:
+      - name: id_dim_estatisticas
+        description: "Identificador único da dimensão."
+      - name: id_piloto
+        description: "Identificador único do piloto."
+      - name: ano
+        description: "Ano da temporada analisada."
+      - name: numero_paradas
+        description: "Quantidade de paradas realizadas pelo piloto durante todas as corridas da temporada."
+      - name: numero_paradas_int
+        description: "Número de paradas convertido para formato inteiro, usado em cálculos e agregações."
+      - name: status_piloto_ano
+        description: "Todos status que o piloto teve ao decorrer da temporada."
+      - name: colocacao_no_campeonato
+        description: "Posição final do piloto no campeonato naquele ano."
+
+  - name: dim_pilotos
+    description: "Dimensão de pilotos construída segundo o modelo de Kimball.
+      Esta tabela representa uma dimensão conformada, contendo atributos descritivos e
+      históricos relacionados aos pilotos da Fórmula 1. Seu objetivo é fornecer uma visão
+      consolidada e enriquecida dos pilotos, permitindo análises no contexto de um Data Warehouse
+      e suportando informações sobre corridas, temporadas, classificações e desempenho ao longo da carreira.
+
+      No modelo dimensional de Kimball, as tabelas dimensão descrevem entidades — como pessoas,
+      produtos, datas ou locais — com atributos textuais, categóricos e semânticos úteis para
+      análise. A dim_pilotos cumpre esse papel ao centralizar informações descritivas dos pilotos,
+      combinando dados de performance (como vitórias e títulos) com dados pessoais (idade,
+      nacionalidade, nome completo).
+
+      Esta dimensão utiliza uma chave substituta (id_dim_pilotos) gerada através de hashing, o que
+      segue as boas práticas de modelagem dimensional para garantir independência da chave natural e
+      estabilidade ao longo do tempo.
+
+      Lógica do Modelo:
+      A dim_pilotos integra informações de múltiplas camadas:
+        - int_dados_pilotos: métricas agregadas de performance na carreira (pontos, vitórias, pódios, etc.).
+        - int_titulos_pilotos: quantidade total de títulos identificada com base em regras históricas.
+        - stg_pilotos: dados cadastrais e identificadores naturais dos pilotos.
+      A junção desses datasets permite criar uma dimensão rica e completa sobre pilotos e suas carreiras na Fórmula 1."
+    columns:
+      - name: id_dim_pilotos
+        description: "Identificador único da dimensão."
+      - name: id_piloto
+        description: "Identificador único do piloto."
+      - name: nome_piloto
+        description: "Nome completo do piloto."
+      - name: abreviacao_piloto
+        description: "Abreviação oficial utilizada para o piloto nas corridas."
+      - name: pontos_totais_carreira
+        description: "Total de pontos acumulados pelo piloto ao longo de sua carreira."
+      - name: titulos
+        description: "Quantidade total de campeonatos conquistados pelo piloto."
+      - name: vitorias
+        description: "Número total de vitórias do piloto."
+      - name: podios
+        description: "Número total de vezes que o piloto terminou em 1º, 2º ou 3º lugar."
+      - name: pole_positions
+        description: "Quantidade de pole positions conquistadas ao longo da carreira."
+      - name: largadas_top10
+        description: "Número de corridas em que o piloto largou dentro das 10 primeiras posições."
+      - name: largadas_fora_top10
+        description: "Número de corridas em que o piloto largou em posições superiores a 10."
+      - name: nacionalidade_piloto
+        description: "Nacionalidade do piloto."
+      - name: data_nascimento_piloto
+        description: "Data de nascimento do piloto."

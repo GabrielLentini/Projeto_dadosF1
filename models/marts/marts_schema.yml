@@ -180,3 +180,201 @@ models:
         description: "Nacionalidade do piloto."
       - name: data_nascimento_piloto
         description: "Data de nascimento do piloto."
+ 
+  - name: fato_corridas_brasil
+    description: "O que é uma Tabela Fato no Modelo Kimball? No modelo dimensional de Kimball, uma tabela fato é o centro do modelo analítico. 
+      Ela contém: Medições numéricas, também chamadas de facts ou métricas. Chaves estrangeiras que se relacionam com as dimensões. Grão definido 
+      (a granularidade exata do que cada linha representa). Em termos simples, uma fato representa um evento mensurável, como uma venda, uma transação ou — 
+      neste caso — a ocorrência de corridas de Fórmula 1 no Brasil. Mesmo quando a tabela fato não possui medidas numéricas (fato degenerada ou de contagem), 
+      ela ainda representa o evento que pode ser analisado.
+
+      2. Finalidade da Tabela fato_corridas_brasil
+      A tabela fato_corridas_brasil consolida informações sobre todas as edições do Grande Prêmio do Brasil (São Paulo Grand Prix / Brazilian Grand Prix). Ela 
+      estabelece a granularidade: 1 linha por ano de realização do GP do Brasil
+      Assim, essa fato permite análises como: Em quais anos o GP do Brasil ocorreu, quantas corridas foram realizadas, relacionamento com outras dimensões 
+      (por ex., pilotos, equipes, resultados) e Séries históricas por edição do GP.
+
+      Embora a tabela não contenha métricas numéricas, ela representa o evento de realização da corrida, funcionando como uma fato de ocorrência.
+
+      3. Por que são retornadas apenas 3 colunas
+      3.1. id_fato_corrida_brasil
+      É a chave substituta (surrogate key) da tabela fato.
+      Criada via dbt_utils.generate_surrogate_key, garante:
+      unicidade
+      estabilidade da chave
+      independência de chaves naturais
+      Ela é baseada em:
+      MAX(dim.id_dim_corridas)
+      Ou seja, o identificador da corrida mais recente daquele ano no qual houve GP do Brasil.
+
+      3.2. id_dim_corridas
+      Chave estrangeira para a dimensão dim_corridas.
+      Justificativas:
+      Mantém o relacionamento entre a fato e suas informações descritivas
+      Apenas a corrida correspondente ao Brasil é considerada
+      A agregação por MAX() garante que, mesmo havendo múltiplos registros intermediários, a fato apontará para o ID único da corrida daquele ano
+      3.3. ano_corrida
+      É o grão da tabela.
+      É retornado porque representa:
+      O atributo descritivo necessário para análises temporais
+      O agrupamento que determina uma linha da fato
+      Sem agrupar por ano, não haveria granularidade definida.
+
+      4. Por que apenas essas três colunas são retornadas? (Resumo)
+      Granularidade definida:
+      O modelo está no nível corrida por ano.
+      Apenas atributos necessários à fato:
+      Chave da fato (id_fato_corrida_brasil)
+      Chave da dimensão (id_dim_corridas)
+      Atributo que define o grão (ano_corrida)
+      Nenhuma métrica é acumulada aqui:
+      O objetivo é registrar a existência da corrida, não qualificar os resultados ou detalhes.
+      Evitar redundância:
+      Outros dados da corrida pertencem à dim_corridas ou a outras dimensões (como pilotos, equipes, voltas etc.)."
+    columns:
+      - name: id_fato_corrida_brasil
+        description: "Identificador único da fato."
+      - name: id_dim_corridas
+        description: "Identificador da dimensão de corridas"
+      - name: ano_corrida
+        description: "Ano em que aconteceu"
+ 
+  - name: fato_ranking_equipes
+    description: "O que é uma Tabela Fato no Modelo Kimball? No modelo dimensional de Kimball, uma tabela fato é o centro do modelo analítico. Ela armazena eventos 
+      mensuráveis ou ocorrências que podem ser analisadas, além de chaves estrangeiras que conectam a fato às dimensões e um grão bem definido que determina o que 
+      cada linha representa. Mesmo quando a fato não contém métricas numéricas complexas, ela continua representando um evento relevante — neste caso, o desempenho 
+      estatístico de pilotos ao longo dos anos.
+
+      2. Finalidade da Tabela fato_ranking_equipes
+      A tabela fato_ranking_equipes registra informações consolidadas sobre pilotos e suas estatísticas de pit stop por ano, permitindo análises de eficiência, 
+      comportamento das equipes e comparação histórica. O grão da tabela é definido como: 1 linha por combinação de piloto, número de paradas e ano. Essa estrutura 
+      possibilita análises como: identificar pilotos com mais ou menos paradas, comparar temporadas, investigar padrões de estratégia de corrida e relacionar dados 
+      com outras dimensões, como desempenho geral e resultados de corrida.
+
+      3. Por que são retornadas essas colunas
+      3.1. id_fato_diferencial_piloto
+      É a chave substituta (surrogate key) da tabela fato, gerada por dbt_utils.generate_surrogate_key a partir de duas informações: dim_e.id_dim_estatisticas 
+      e int_pt.id_piloto. Esse padrão garante unicidade, estabilidade da chave e independência de chaves naturais.
+
+      3.2. id_dim_estatisticas
+      Chave estrangeira que referencia a dimensão dim_estatisticas. Permite acessar atributos descritivos adicionais (como nome do piloto, equipe, número do carro, etc.), 
+      criando o vínculo necessário entre a fato e as características do piloto e de sua performance geral.
+
+      3.3. id_piloto
+      Identificador do piloto vindo da camada intermediária (int_pit_stops). É necessário para relacionar a fato diretamente ao piloto e também serve como componente 
+      do grão da tabela.
+
+      3.4. numero_paradas
+      É uma métrica fundamental da tabela, pois representa o número de pit stops realizados pelo piloto em uma corrida ou ao longo da temporada 
+      (dependendo da modelagem anterior). Como faz parte do grão, ele precisa estar presente tanto no SELECT quanto no GROUP BY.
+
+      3.5. ano
+      Define o período da análise e compõe o grão: a fato diferencia registros iguais de pilotos e paradas em anos diferentes. É indispensável para análise 
+      histórica e para evitar duplicidade.
+
+      4. Por que apenas essas colunas são retornadas?
+      O objetivo da tabela é registrar o evento “piloto X fez Y paradas no ano Z”, formando uma fato granular e consistente. Por isso:
+      - O grão está definido pela combinação (piloto, número de paradas, ano).
+      - Apenas os atributos essenciais para análise e relacionamento com dimensões são retornados.
+      - Nenhuma métrica adicional é acumulada neste modelo, pois os detalhes complementares já existem na dim_estatisticas ou em outras dimensões.
+      - Evita-se redundância, garantindo que atributos descritivos permaneçam nas dimensões, e que a fato mantenha apenas chaves e medidas mínimas necessárias para análise."
+    columns:
+      - name: id_fato_diferencial_piloto
+        description: "Identificador único da fato."
+      - name: id_dim_estatisticas
+        description: "Identificador da dimensão de estatísticas"
+      - name: id_piloto
+        description: "Identificador único do piloto"
+      - name: numero_paradas
+        description: "Numero de paradas no boxe do piloto no ano."
+      - name: ano
+        description: "Ano da temporada"
+  
+  - name: fato_ranking_equipes
+    description: "O que é a tabela fato_ranking_equipes?
+      A tabela fato_ranking_equipes representa uma fato do modelo dimensional de Kimball, armazenando informações sobre o desempenho das equipes de Fórmula 1. 
+      No modelo de Kimball, uma tabela fato registra eventos mensuráveis associados a um grão específico, além de chaves que a relacionam com dimensões. 
+      Essa tabela consolida métricas essenciais de performance das equipes, permitindo análises comparativas entre construtoras e estudos históricos sobre 
+      seus resultados ao longo das temporadas.
+
+      Finalidade da tabela
+      A tabela fato_ranking_equipes tem como objetivo centralizar as estatísticas principais de cada equipe, como vitórias, pódios e pole positions, vinculadas 
+      a uma dimensão descritiva (dim_equipes). Ela possibilita análises como: comparar o desempenho de equipes ao longo do tempo, identificar dominância de construtoras 
+      e medir impacto de temporadas específicas.
+
+      Quais são as colunas e por que elas são retornadas?
+      id_fato_ranking_equipe
+      É a chave substituta (surrogate key) da fato, gerada por dbt_utils.generate_surrogate_key a partir da combinação entre dim.id_dim_equipes e int_de.id_equipe. 
+      Essa chave garante unicidade e independência de chaves naturais, representando de forma única o evento “performance consolidada da equipe”.
+
+      id_dim_equipes
+      É a chave estrangeira que relaciona a fato à dimensão dim_equipes, onde estão os atributos descritivos, como nome, país, motor, cores, histórico e demais 
+      informações que caracterizam a equipe. Essa coluna é essencial para conectar métricas ao contexto descritivo.
+
+      vitorias, podios, pole_positions
+      São as métricas principais da tabela. Esses valores representam o desempenho esportivo da equipe e constituem o núcleo da análise quantitativa. Cada uma 
+      dessas métricas faz parte do grão da fato, pois a linha representa a consolidação estatística da equipe em determinado contexto. 
+      Elas são retornadas porque são indicadores diretos e mensuráveis de performance.
+
+      Por que apenas essas colunas são retornadas? (Resumo)
+      A tabela traz somente o necessário para uma fato bem definida:
+      - A chave principal da fato (id_fato_ranking_equipe).
+      - A chave estrangeira para a dimensão (id_dim_equipes).
+      - As métricas que representam o desempenho da equipe (vitórias, pódios e pole positions).
+      Outros atributos descritivos pertencem exclusivamente à dim_equipes, evitando redundância. A fato mantém apenas o que é mensurável e relacionável, garantindo 
+      um modelo limpo, consistente e alinhado ao padrão dimensional."
+    columns:
+      - name: id_fato_ranking_equipe
+        description: "Identificador único da fato."
+      - name: id_dim_equipes
+        description: "Identificador da dimensão de equipes."
+      - name: vitorias
+        description: "Número de vitórias da equipe."
+      - name: podios
+        description: "Número de pódios da equipe."
+      - name: pole_positions
+        description: "Número de pole positions da equipe."
+  
+  - name: fato_ranking_pilotos
+    description: "O que é a tabela fato_ranking_pilotos?
+      A tabela fato_ranking_pilotos é uma fato do modelo dimensional de Kimball e representa os principais indicadores de desempenho dos pilotos de Fórmula 1. 
+      No modelo de Kimball, uma tabela fato reúne eventos mensuráveis associados a um grão específico, vinculados a dimensões que fornecem o contexto descritivo. 
+      Neste caso, a tabela consolida estatísticas essenciais dos pilotos, permitindo análises comparativas e avaliações históricas de performance.
+
+      Finalidade da tabela
+      O objetivo da tabela fato_ranking_pilotos é centralizar métricas que representam o desempenho esportivo de cada piloto, como vitórias, pódios e pole positions, 
+      conectadas a sua dimensão descritiva (dim_pilotos). Isso permite análises como: comparação de pilotos em diferentes temporadas, identificação de dominância esportiva, 
+      estudo de evolução individual e avaliação dos resultados mais relevantes na carreira de cada piloto.
+
+      Colunas retornadas e justificativas
+      id_fato_ranking_pilotos
+      É a chave substituta (surrogate key) da tabela fato, criada por dbt_utils.generate_surrogate_key combinando dim.id_dim_pilotos e int_dp.id_piloto. Essa abordagem garante 
+      unicidade, estabilidade e independência de chaves naturais, representando de forma única o conjunto consolidado de métricas do piloto.
+
+      id_dim_pilotos
+      Chave estrangeira que conecta a fato à dimensão dim_pilotos, onde estão os atributos descritivos como nome, nacionalidade, equipe atual, número do carro e demais 
+      informações relevantes. Essa coluna é necessária para relacionar as métricas com o contexto informacional do piloto.
+
+      vitorias, podios, pole_positions
+      São as métricas principais da tabela e representam diretamente o desempenho quantitativo do piloto ao longo das temporadas. Elas compõem o grão da fato, 
+      pois cada linha representa o conjunto consolidado de resultados do piloto em determinado contexto definido pela camada intermediária (int_dados_pilotos). 
+      Essas métricas são essenciais para análises comparativas e avaliação histórica.
+
+      Por que apenas essas colunas são retornadas?
+      A tabela mantém somente os elementos indispensáveis para uma fato bem estruturada:
+      - A chave substituta da fato (id_fato_ranking_pilotos).
+      - A chave estrangeira para a dimensão (id_dim_pilotos).
+      - As métricas que caracterizam o desempenho do piloto (vitórias, pódios, pole positions).
+      Todos os atributos descritivos permanecem na dimensão, evitando redundância e garantindo que a fato contenha apenas indicadores mensuráveis e relacionáveis, 
+      mantendo o modelo limpo, consistente e alinhado ao padrão dimensional."
+    columns:
+      - name: id_fato_ranking_pilotos
+        description: "Identificador único da fato."
+      - name: id_dim_pilotos
+        description: "Identificador da dimensão de pilotos."
+      - name: vitorias
+        description: "Número de vitórias do piloto."
+      - name: podios
+        description: "Número de pódios do piloto."
+      - name: pole_positions
+        description: "Número de pole positions do piloto."

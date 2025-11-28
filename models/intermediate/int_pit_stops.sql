@@ -5,10 +5,10 @@
 ) }}
 
 SELECT
-    pt.id_piloto,
-    c.ano_corrida AS ano,
+    ps.id_piloto,
+    cor.ano_corrida AS ano,
     COUNT(*) AS numero_paradas
-FROM {{ ref('stg_pit_stops') }} AS pt
-LEFT JOIN {{ ref('stg_corridas') }} AS c
-    ON pt.id_corrida = c.id_corrida
-GROUP BY pt.id_piloto, c.ano_corrida
+FROM {{ ref('stg_pit_stops') }} AS ps
+LEFT JOIN {{ ref('stg_corridas') }} AS cor
+    ON ps.id_corrida = cor.id_corrida
+GROUP BY ps.id_piloto, cor.ano_corrida

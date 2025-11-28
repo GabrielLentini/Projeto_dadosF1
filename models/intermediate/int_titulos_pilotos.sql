@@ -7,21 +7,21 @@
 -- noqa:disable=AM03
 WITH pontos_corrida AS (
     SELECT
-        c.ano_corrida,
-        r.id_piloto,
-        r.id_corrida,
-        (COALESCE(r.pontos, 0) + COALESCE(s.pontos, 0)) AS pontos_corrida,
+        cor.ano_corrida,
+        res.id_piloto,
+        res.id_corrida,
+        (COALESCE(res.pontos, 0) + COALESCE(spr.pontos, 0)) AS pontos_corrida,
         ROW_NUMBER() OVER (
-            PARTITION BY c.ano_corrida, r.id_piloto
-            ORDER BY (COALESCE(r.pontos, 0) + COALESCE(s.pontos, 0)) DESC
+            PARTITION BY cor.ano_corrida, res.id_piloto
+            ORDER BY (COALESCE(res.pontos, 0) + COALESCE(spr.pontos, 0)) DESC
         ) AS rn
-    FROM {{ ref('stg_resultados') }} AS r
-    LEFT JOIN {{ ref('stg_corridas') }} AS c
-        ON r.id_corrida = c.id_corrida
-    LEFT JOIN {{ ref('stg_sprint') }} AS s
+    FROM {{ ref('stg_resultados') }} AS res
+    LEFT JOIN {{ ref('stg_corridas') }} AS cor
+        ON res.id_corrida = cor.id_corrida
+    LEFT JOIN {{ ref('stg_sprint') }} AS spr
         ON
-            s.id_corrida = c.id_corrida
-            AND s.id_piloto = r.id_piloto
+            spr.id_corrida = cor.id_corrida
+            AND spr.id_piloto = res.id_piloto
 ),
 
 pontos_validos AS (

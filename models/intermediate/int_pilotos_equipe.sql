@@ -5,17 +5,17 @@
 ) }}
 
 SELECT
-    MAX(c.id_equipe) AS id_equipe,
+    MAX(con.id_equipe) AS id_equipe,
     JSONB_BUILD_OBJECT(
-        c.nome_equipe,
+        con.nome_equipe,
         JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT(
-            'id_piloto', p.id_piloto,
-            'nome_piloto', p.nome_piloto
+            'id_piloto', pil.id_piloto,
+            'nome_piloto', pil.nome_piloto
         ))
     ) AS pilotos_da_equipe
-FROM {{ ref('stg_construtores') }} AS c
-LEFT JOIN {{ ref('stg_resultados') }} AS r
-    ON r.id_equipe = c.id_equipe
-LEFT JOIN {{ ref('stg_pilotos') }} AS p
-    ON r.id_piloto = p.id_piloto
-GROUP BY c.nome_equipe
+FROM {{ ref('stg_construtores') }} AS con
+LEFT JOIN {{ ref('stg_resultados') }} AS res
+    ON res.id_equipe = con.id_equipe
+LEFT JOIN {{ ref('stg_pilotos') }} AS pil
+    ON res.id_piloto = pil.id_piloto
+GROUP BY con.nome_equipe

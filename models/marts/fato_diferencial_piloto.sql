@@ -1,19 +1,19 @@
 {{ config(
-    unique_key='id_fato_diferencial_piloto',
+    unique_key='id_diferencial_piloto',
     materialized='table',
     tags=['estatisticas']
 ) }}
 
 SELECT
     {{ dbt_utils.generate_surrogate_key([
-        'MAX(dim_e.id_dim_estatisticas)',
-        'MAX(int_pt.id_piloto)'
-    ]) }} AS id_fato_diferencial_piloto,
-    MAX(dim_e.id_dim_estatisticas) AS id_dim_estatisticas,
-    MAX(int_pt.id_piloto) AS id_piloto,
-    int_pt.numero_paradas,
-    int_pt.ano
-FROM {{ ref('int_pit_stops') }} AS int_pt
-LEFT JOIN {{ ref('dim_estatisticas') }} AS dim_e
-    ON int_pt.id_piloto = dim_e.id_piloto
-GROUP BY int_pt.numero_paradas, int_pt.ano
+        'MAX(est.id_estatisticas)',
+        'MAX(ps.id_piloto)'
+    ]) }} AS id_diferencial_piloto,
+    MAX(est.id_estatisticas) AS id_estatisticas,
+    MAX(ps.id_piloto) AS id_piloto,
+    ps.numero_paradas,
+    ps.ano
+FROM {{ ref('int_pit_stops') }} AS ps
+LEFT JOIN {{ ref('dim_estatisticas') }} AS est
+    ON ps.id_piloto = est.id_piloto
+GROUP BY ps.numero_paradas, ps.ano

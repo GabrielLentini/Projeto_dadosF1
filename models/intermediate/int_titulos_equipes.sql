@@ -30,8 +30,8 @@ WITH titulos_oficiais AS (
 )
 
 SELECT
-    c.id_equipe,
-    t.titulos
-FROM titulos_oficiais AS t
-LEFT JOIN {{ ref('stg_construtores') }} AS c
-    ON c.nome_equipe = t.nome_equipe_oficial
+    con.id_equipe,
+    tit.titulos
+FROM titulos_oficiais AS tit
+LEFT JOIN {{ ref('stg_construtores') }} AS con
+    ON con.nome_equipe = tit.nome_equipe_oficial

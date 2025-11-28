@@ -6,18 +6,19 @@
 
 WITH pontos_corrida AS (
     SELECT
-        r.id_piloto,
-        c.ano_corrida,
-        (COALESCE(r.pontos, 0) + COALESCE(s.pontos, 0)) AS pontos_corrida,
+        res.id_piloto,
+        cor.ano_corrida,
+        (COALESCE(res.pontos, 0) + COALESCE(spr.pontos, 0)) AS pontos_corrida,
         ROW_NUMBER() OVER (
-            PARTITION BY r.id_piloto, c.ano_corrida
-            ORDER BY (COALESCE(r.pontos, 0) + COALESCE(s.pontos, 0)) DESC
+            PARTITION BY res.id_piloto, cor.ano_corrida
+            ORDER BY (COALESCE(res.pontos, 0) + COALESCE(spr.pontos, 0)) DESC
         ) AS rn
-    FROM {{ ref('stg_resultados') }} r
-    LEFT JOIN {{ ref('stg_corridas') }} c ON r.id_corrida = c.id_corrida
-    LEFT JOIN {{ ref('stg_sprint') }} s
-        ON r.id_corrida = s.id_corrida
-        AND r.id_piloto = s.id_piloto
+    FROM {{ ref('stg_resultados') }} AS res
+    LEFT JOIN {{ ref('stg_corridas') }} cor
+        ON res.id_corrida = cor.id_corrida
+    LEFT JOIN {{ ref('stg_sprint') }} spr
+        ON res.id_corrida = spr.id_corrida
+        AND res.id_piloto = spr.id_piloto
 ),
 
 pontos_validos AS (

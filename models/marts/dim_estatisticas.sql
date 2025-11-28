@@ -6,11 +6,10 @@
 
 --noqa:disable=LT05, CV11
 SELECT
-    {{ dbt_utils.generate_surrogate_key(['pc.id_piloto', 'pt.numero_paradas', 'pc.ano']) }} AS id_dim_estatisticas,
+    {{ dbt_utils.generate_surrogate_key(['pc.id_piloto', 'pt.numero_paradas', 'pc.ano']) }} AS id_estatisticas,
     pc.id_piloto,
     st.ano,
-    COALESCE(pt.numero_paradas::text, '(N/A)') AS numero_paradas,
-    pt.numero_paradas AS numero_paradas_int,
+    pt.numero_paradas,
     st.status_piloto_ano,
     pc.colocacao_no_campeonato
 FROM {{ ref('int_posicao_campeonato') }} AS pc

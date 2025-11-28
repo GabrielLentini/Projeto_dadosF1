@@ -4,11 +4,19 @@
     tags=['tempo', 'estatisticas']
 ) }}
 
+WITH cte_numero_paradas AS (
+    SELECT
+        ps.id_piloto,
+        cor.ano_corrida AS ano,
+        COUNT(*) AS numero_paradas
+    FROM {{ ref('stg_pit_stops') }} AS ps
+    LEFT JOIN {{ ref('stg_corridas') }} AS cor
+        ON ps.id_corrida = cor.id_corrida
+    GROUP BY ps.id_piloto, cor.ano_corrida
+)
+
 SELECT
-    ps.id_piloto,
-    cor.ano_corrida AS ano,
-    COUNT(*) AS numero_paradas
-FROM {{ ref('stg_pit_stops') }} AS ps
-LEFT JOIN {{ ref('stg_corridas') }} AS cor
-    ON ps.id_corrida = cor.id_corrida
-GROUP BY ps.id_piloto, cor.ano_corrida
+    id_piloto,
+    ano,
+    {{ string_field('numero_paradas') }} AS numero_paradas
+FROM cte_numero_paradas

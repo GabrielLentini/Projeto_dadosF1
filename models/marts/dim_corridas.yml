@@ -1,0 +1,102 @@
+version: 2
+
+models:
+  - name: dim_corridas
+    tags: ["estatisticas", "resultados"]
+    description: >
+      Dimensão de corridas construída segundo o modelo de Kimball.
+      Esta tabela representa uma dimensão conformada que consolida atributos históricos e descritivos de cada corrida da Fórmula 1. Seu objetivo é fornecer 
+      uma visão única e padronizada dos eventos, permitindo análises ao longo de diferentes temporadas, circuitos e desempenhos individuais, além de servir de base 
+      para fatos relacionados a resultados, pilotos e equipes.
+
+      No contexto do modelo dimensional, as tabelas dimensão descrevem entidades por meio de atributos textuais, categóricos e contextuais. A dim_corridas cumpre 
+      esse papel ao centralizar informações essenciais sobre cada prova — como circuito, ano, data, volta mais rápida e pilotos de destaque — fornecendo uma 
+      estrutura consistente para análises históricas e comparativos entre temporadas.
+
+      A tabela utiliza uma chave substituta (id_dim_corridas) gerada por hashing a partir de identificadores naturais da corrida e de seu respectivo resultado. 
+      Essa abordagem segue boas práticas de modelagem dimensional, garantindo estabilidade da chave, independência das chaves operacionais e robustez para evolução do modelo.
+
+      Lógica do Modelo:
+      A construção da dimensão integra dados de múltiplas camadas do pipeline:
+      stg_corridas: contém atributos estruturais da corrida, como ano, circuito e data.
+      stg_resultados: fornece dados de desempenho, incluindo volta mais rápida, voltas concluídas e tempos totais.
+      int_dados_corrida: agrega informações adicionais como os pilotos nas três primeiras posições e o pole position.
+      Como cada corrida pode possuir múltiplos registros de resultados, o modelo aplica funções de agregação para garantir um único registro por corrida, 
+      o que é coerente com sua função dimensional. O agrupamento final por id_corrida assegura que a dimensão traga exatamente uma linha por evento, 
+      consolidando todos os atributos relevantes em uma representação única e confiável.
+
+    columns:
+      - name: id_corridas
+        description: "Identificador único da dimensão de corridas."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]          
+      - name: id_corrida
+        description: "Identificador único da corrida."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: id_resultado
+        description: "Identificador único do resultado."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: ano_corrida
+        description: "Ano em que a corrida ocorreu."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1950
+              max_value: 2024              
+      - name: nome_circuito
+        description: "Nome oficial do circuito onde a corrida foi realizada."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: data_corrida
+        description: "Data da realização da corrida."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: tempo_conclusao_corrida
+        description: "Tempo total para conclusão da corrida. Caso piloto não tenha vencido é calculada a diferença pro tempo do vencedor."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: voltas_concluidas
+        description: "Número total de voltas completadas."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: tempo_volta_mais_rapida
+        description: "Tempo registrado da volta mais rápida da corrida."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: primeiro_colocado
+        description: "Nome do piloto que terminou em primeiro lugar."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: segundo_colocado
+        description: "Nome do piloto que terminou em segundo lugar."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+              config:
+                severity: warn
+                warn_if: ">0"
+                error_if: ">1"
+      - name: terceiro_colocado
+        description: "Nome do piloto que terminou em terceiro lugar."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        
+      - name: piloto_pole_position
+        description: "Piloto que largou na pole position."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]        

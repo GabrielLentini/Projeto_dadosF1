@@ -1,0 +1,76 @@
+version: 2
+
+models:
+  - name: fato_ranking_pilotos
+    tags: ["estatisticas", "resultados"]
+    description: >
+      O que é a tabela fato_ranking_pilotos?
+      A tabela fato_ranking_pilotos é uma fato do modelo dimensional de Kimball e representa os principais indicadores de desempenho dos pilotos de Fórmula 1. 
+      No modelo de Kimball, uma tabela fato reúne eventos mensuráveis associados a um grão específico, vinculados a dimensões que fornecem o contexto descritivo. 
+      Neste caso, a tabela consolida estatísticas essenciais dos pilotos, permitindo análises comparativas e avaliações históricas de performance.
+
+      Finalidade da tabela
+      O objetivo da tabela fato_ranking_pilotos é centralizar métricas que representam o desempenho esportivo de cada piloto, como vitórias, pódios e pole positions, 
+      conectadas a sua dimensão descritiva (dim_pilotos). Isso permite análises como: comparação de pilotos em diferentes temporadas, identificação de dominância esportiva, 
+      estudo de evolução individual e avaliação dos resultados mais relevantes na carreira de cada piloto.
+
+      Colunas retornadas e justificativas
+      id_fato_ranking_pilotos
+      É a chave substituta (surrogate key) da tabela fato, criada por dbt_utils.generate_surrogate_key combinando dim.id_dim_pilotos e int_dp.id_piloto. Essa abordagem garante 
+      unicidade, estabilidade e independência de chaves naturais, representando de forma única o conjunto consolidado de métricas do piloto.
+
+      id_dim_pilotos
+      Chave estrangeira que conecta a fato à dimensão dim_pilotos, onde estão os atributos descritivos como nome, nacionalidade, equipe atual, número do carro e demais 
+      informações relevantes. Essa coluna é necessária para relacionar as métricas com o contexto informacional do piloto.
+
+      vitorias, podios, pole_positions
+      São as métricas principais da tabela e representam diretamente o desempenho quantitativo do piloto ao longo das temporadas. Elas compõem o grão da fato, 
+      pois cada linha representa o conjunto consolidado de resultados do piloto em determinado contexto definido pela camada intermediária (int_dados_pilotos). 
+      Essas métricas são essenciais para análises comparativas e avaliação histórica.
+
+      Por que apenas essas colunas são retornadas?
+      A tabela mantém somente os elementos indispensáveis para uma fato bem estruturada:
+      - A chave substituta da fato (id_fato_ranking_pilotos).
+      - A chave estrangeira para a dimensão (id_dim_pilotos).
+      - As métricas que caracterizam o desempenho do piloto (vitórias, pódios, pole positions).
+      Todos os atributos descritivos permanecem na dimensão, evitando redundância e garantindo que a fato contenha apenas indicadores mensuráveis e relacionáveis, 
+      mantendo o modelo limpo, consistente e alinhado ao padrão dimensional.
+
+    columns:
+      - name: id_fato_ranking_pilotos
+        description: "Identificador único da fato."
+        data_tests:
+          - unique:
+              tags: ["generic", "unique"]
+          - not_null:
+              tags: ["generic", "null"]
+      - name: id_piloto
+        description: "Identificador da dimensão de pilotos."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: vitorias
+        description: "Número de vitórias do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 106
+      - name: podios
+        description: "Número de pódios do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+        description: "Número de pole positions da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 203
+      - name: pole_positions
+        description: "Número de pole positions da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 105

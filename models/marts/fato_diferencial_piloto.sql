@@ -7,7 +7,9 @@
 SELECT
     {{ dbt_utils.generate_surrogate_key([
         'MAX(est.id_estatisticas)',
-        'MAX(ps.id_piloto)'
+        'MAX(ps.id_piloto)',
+        'ps.numero_paradas',
+        'ps.ano'
     ]) }} AS id_diferencial_piloto,
     MAX(est.id_estatisticas) AS id_estatisticas,
     MAX(ps.id_piloto) AS id_piloto,

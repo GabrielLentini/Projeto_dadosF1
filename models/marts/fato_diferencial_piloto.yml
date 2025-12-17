@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: fato_diferencial_piloto
+    tags: ["estatisticas", "resultados"]
+    description: "1. O que é uma Tabela Fato no Modelo Kimball? No modelo dimensional de Kimball, uma tabela fato representa eventos ou ocorrências mensuráveis 
+      dentro de um processo de negócio. Ela é caracterizada por: Chaves estrangeiras que apontam para dimensões Um grão bem definido (o que exatamente cada linha representa)
+      Métricas numéricas ou a simples ocorrência de um evento (fato de ocorrência) Mesmo quando não há métricas acumuladas clássicas (como soma ou média), a tabela 
+      fato continua válida quando o objetivo é permitir análises comparativas, contagens ou correlações entre dimensões.
+      2. Finalidade da tabela fato_diferencial_piloto
+      A tabela fato_diferencial_piloto consolida informações relacionadas ao número de paradas nos boxes realizadas por pilotos em determinado ano, permitindo 
+      análises comparativas de estratégia e comportamento ao longo do tempo. A granularidade da tabela é: 1 linha por combinação de (ano, número de paradas)
+      Cada linha representa a ocorrência de pilotos que realizaram um determinado número de paradas em um ano específico, vinculando essa informação a um piloto e 
+      ao conjunto de estatísticas associadas. Essa tabela possibilita análises como:
+      Comparação de estratégias de pit stop entre anos
+      Avaliação do impacto do número de paradas no desempenho de pilotos
+      Relacionamento com estatísticas agregadas do piloto
+      Séries históricas de comportamento estratégico
+      3. Grão da Tabela
+      O grão da tabela é definido explicitamente pelo GROUP BY:
+      GROUP BY ps.numero_paradas, ps.ano
+      Ou seja:
+      Cada linha representa um determinado número de paradas realizadas em um ano específico
+      As chaves de piloto e estatísticas são consolidadas via MAX() para garantir unicidade e estabilidade da relação dimensional."
+    columns:
+      - name: id_diferencial_piloto
+        description: "Identificador único da tabela"
+        data_tests:
+          - unique:
+              tags: ["generic", "unique"]
+          - not_null:
+              tags: ["generic", "null"]
+      - name: id_estatisticas
+        description: "Identificador único da dim_estatisticas."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: id_piloto
+        description: "Identificador único do piloto"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: numero_paradas
+        description: "Número de paradas realizadas pelo piloto no boxe na temporada"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: ano
+        description: "Ano da temporada"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1950
+              max_value: 2024

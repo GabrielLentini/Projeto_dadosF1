@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: fato_corridas_brasil
+    tags: ["estatisticas", "resultados"]
+    description: "O que é uma Tabela Fato no Modelo Kimball? No modelo dimensional de Kimball, uma tabela fato é o centro do modelo analítico. 
+      Ela contém: Medições numéricas, também chamadas de facts ou métricas. Chaves estrangeiras que se relacionam com as dimensões. Grão definido 
+      (a granularidade exata do que cada linha representa). Em termos simples, uma fato representa um evento mensurável, como uma venda, uma transação ou — 
+      neste caso — a ocorrência de corridas de Fórmula 1 no Brasil. Mesmo quando a tabela fato não possui medidas numéricas (fato degenerada ou de contagem), 
+      ela ainda representa o evento que pode ser analisado.
+
+      2. Finalidade da Tabela fato_corridas_brasil
+      A tabela fato_corridas_brasil consolida informações sobre todas as edições do Grande Prêmio do Brasil (São Paulo Grand Prix / Brazilian Grand Prix). Ela 
+      estabelece a granularidade: 1 linha por ano de realização do GP do Brasil
+      Assim, essa fato permite análises como: Em quais anos o GP do Brasil ocorreu, quantas corridas foram realizadas, relacionamento com outras dimensões 
+      (por ex., pilotos, equipes, resultados) e Séries históricas por edição do GP.
+
+      Embora a tabela não contenha métricas numéricas, ela representa o evento de realização da corrida, funcionando como uma fato de ocorrência.
+
+      3. Por que são retornadas apenas 3 colunas
+      3.1. id_fato_corrida_brasil
+      É a chave substituta (surrogate key) da tabela fato.
+      Criada via dbt_utils.generate_surrogate_key, garante:
+      unicidade
+      estabilidade da chave
+      independência de chaves naturais
+      Ela é baseada em:
+      MAX(dim.id_dim_corridas)
+      Ou seja, o identificador da corrida mais recente daquele ano no qual houve GP do Brasil.
+
+      3.2. id_dim_corridas
+      Chave estrangeira para a dimensão dim_corridas.
+      Justificativas:
+      Mantém o relacionamento entre a fato e suas informações descritivas
+      Apenas a corrida correspondente ao Brasil é considerada
+      A agregação por MAX() garante que, mesmo havendo múltiplos registros intermediários, a fato apontará para o ID único da corrida daquele ano
+      3.3. ano_corrida
+      É o grão da tabela.
+      É retornado porque representa:
+      O atributo descritivo necessário para análises temporais
+      O agrupamento que determina uma linha da fato
+      Sem agrupar por ano, não haveria granularidade definida.
+
+      4. Por que apenas essas três colunas são retornadas? (Resumo)
+      Granularidade definida:
+      O modelo está no nível corrida por ano.
+      Apenas atributos necessários à fato:
+      Chave da fato (id_fato_corrida_brasil)
+      Chave da dimensão (id_dim_corridas)
+      Atributo que define o grão (ano_corrida)
+      Nenhuma métrica é acumulada aqui:
+      O objetivo é registrar a existência da corrida, não qualificar os resultados ou detalhes.
+      Evitar redundância:
+      Outros dados da corrida pertencem à dim_corridas ou a outras dimensões (como pilotos, equipes, voltas etc.)."
+    columns:
+      - name: id_corrida
+        description: "Identificador único da corrida"
+        data_tests:
+          - unique:
+              tags: ["generic", "unique"]
+          - not_null:
+              tags: ["generic", "null"]
+      - name: ano_corrida
+        description: "Ano em que aconteceu a corrida"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1973
+              max_value: 2024

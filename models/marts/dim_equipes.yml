@@ -1,0 +1,85 @@
+version: 2
+
+models:
+  - name: dim_equipes
+    tags: ["estatisticas", "resultados"]
+    description: >
+     Dimensão de equipes construída segundo o modelo de Kimball. Esta tabela representa uma dimensão conformada que centraliza atributos históricos, 
+     descritivos e de desempenho das equipes da Fórmula 1. Seu objetivo é fornecer uma visão completa, estável e padronizada das escuderias ao longo das temporadas, 
+     permitindo análises sobre desempenho esportivo, evolução histórica, composição de pilotos e comparações entre construtores.
+
+      No modelo dimensional, as tabelas dimensão descrevem entidades com atributos textuais e categóricos que contextualizam fatos. A dim_equipes cumpre esse papel 
+      ao consolidar informações essenciais sobre cada equipe — como nome, nacionalidade, pilotos que já competiram pela escuderia e métricas agregadas de performance, 
+      incluindo vitórias, pódios, largadas e pontos totais acumulados na história.
+
+      A tabela utiliza uma chave substituta (id_dim_equipes) gerada via hashing a partir do identificador natural da equipe. Essa abordagem segue boas práticas de 
+      modelagem dimensional ao garantir independência da chave operacional e estabilidade mesmo diante de mudanças no sistema de origem.
+
+      Lógica do Modelo:
+      A dimensão integra dados provenientes de múltiplas camadas transformadas no pipeline:
+      int_dados_equipes: concentra métricas agregadas de performance da equipe ao longo da história, como pontos totais, vitórias, pódios, pole positions e 
+      estatísticas de largadas.
+      int_titulos_equipes: retorna a quantidade total de títulos conquistados pela equipe; seu valor é incorporado com tratamento para casos onde não há títulos registrados.
+      stg_construtores: oferece atributos descritivos, como nome oficial e nacionalidade da equipe, funcionando como base cadastral.
+      int_pilotos_equipe: consolida todos os pilotos que já competiram pela equipe, permitindo análises de composição histórica da escuderia.
+      Esses datasets são combinados por meio de junções utilizando id_equipe como chave natural. O resultado final é uma dimensão completa, unificada e de 
+      granularidade única por equipe, refletindo tanto atributos fixos (como nome e nacionalidade) quanto indicadores acumulados de desempenho.
+
+    columns:
+      - name: id_dim_equipes
+        description: "Identificador único da dimensão."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]
+      - name: id_equipe
+        description: "Identificador único da equipe"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: nome_equipe
+        description: "Nome da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: pontos_totais_equipe
+        description: "Total de pontos acumulados pelo equipe na história."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: vitorias
+        description: "Número total de vitórias da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: podios
+        description: "Número total de vezes que os pilotos da equipe terminaram em 1º, 2º ou 3º lugar."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: pole_positions
+        description: "Quantidade de pole positions conquistadas por pilotos da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: largadas_top10
+        description: "Número de corridas em que pilotos da equipe largaram dentro das 10 primeiras posições."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: largadas_fora_top10
+        description: "Número de corridas em que pilotos da equipe largaram em posições superiores a 10."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: nacionalidade_equipe
+        description: "Nacionalidade da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: pilotos_da_equipe
+        description: "Nome de todos pilotos que correram pelo menos uma corrida pela equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

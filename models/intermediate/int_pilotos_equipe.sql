@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    MAX(con.id_equipe) AS id_equipe,
+    con.id_equipe,
     JSONB_BUILD_OBJECT(
         con.nome_equipe,
         JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT(
@@ -18,4 +18,4 @@ LEFT JOIN {{ ref('stg_resultados') }} AS res
     ON res.id_equipe = con.id_equipe
 LEFT JOIN {{ ref('stg_pilotos') }} AS pil
     ON res.id_piloto = pil.id_piloto
-GROUP BY con.nome_equipe
+GROUP BY con.id_equipe, con.nome_equipe

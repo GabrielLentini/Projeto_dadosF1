@@ -9,7 +9,7 @@ SELECT
         'pil.id_pilotos',
         'dp.id_piloto'
     ]) }} AS id_fato_ranking_pilotos,
-    pil.id_pilotos,
+    pil.id_pilotos AS id_piloto,
     dp.vitorias,
     dp.podios,
     dp.pole_positions

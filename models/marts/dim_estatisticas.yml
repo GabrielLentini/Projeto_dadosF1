@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: dim_estatisticas
+    tags: ["estatisticas", "resultados"]
+    description: >
+      Dimensão de estatísticas construída segundo o modelo de Kimball. Esta tabela consolida informações históricas e descritivas sobre o desempenho dos pilotos 
+      em cada temporada da Fórmula 1, funcionando como uma dimensão conformada que contextualiza fatos relacionados a posições no campeonato, número de pit stops e status 
+      esportivo ao longo do ano. Seu propósito é fornecer uma visão unificada, granular por piloto e temporada, permitindo análises mais ricas sobre consistência, estratégia 
+      de corrida, participação e evolução histórica.
+
+      No contexto dimensional, esta dimensão descreve atributos que variam ano a ano, capturando características relevantes para análises esportivas. A dim_estatisticas reúne 
+      dados como número de paradas nos boxes, colocação final na temporada e status do piloto. Esses atributos permitem que fatos relacionados a corridas ou temporadas sejam 
+      analisados sob diferentes perspectivas comportamentais e estratégicas.
+
+      A tabela utiliza uma chave substituta (id_dim_estatisticas) gerada por hashing a partir do piloto, do ano e do total de paradas — combinação que assegura granularidade 
+      consistente e independência das chaves naturais. Esse padrão segue as melhores práticas de modelagem dimensional, mantendo estabilidade e evitando dependência direta 
+      os sistemas transacionais.
+
+      Lógica do Modelo:
+      A dimensão integra três componentes principais:
+      int_posicao_campeonato: fornece a base da granularidade (piloto x ano), incluindo a colocação final no campeonato e o identificador natural do piloto.
+      int_status: adiciona o status do piloto em cada temporada, indicando participação e condições especiais ao longo do ano.
+      int_pit_stops: agrega o número de pit stops realizados na temporada, retornando tanto o valor inteiro quanto sua representação textual.
+
+      As junções utilizam sempre a combinação de id_piloto e ano, garantindo integridade entre os datasets.
+
+columns:
+  - name: id_dim_estatisticas
+    description: "Identificador único da dimensão."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+      - unique:
+          tags: ["generic", "unique"]
+  - name: id_piloto
+    description: "Identificador único do piloto."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: ano
+    description: "Ano da temporada analisada."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+      - dbt_expectations.expect_column_values_to_be_between:
+          min_value: 1950
+          max_value: 2024
+  - name: numero_paradas
+    description: "Quantidade de paradas realizadas pelo piloto durante todas as corridas da temporada."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: numero_paradas_int
+    description: "Número de paradas convertido para formato inteiro, usado em cálculos e agregações."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: status_piloto_ano
+    description: "Todos status que o piloto teve ao decorrer da temporada."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: colocacao_no_campeonato
+    description: "Posição final do piloto no campeonato naquele ano."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]

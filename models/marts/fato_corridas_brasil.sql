@@ -5,7 +5,7 @@
 ) }}
 
 SELECT
-    MAX(cor.id_corridas) AS id_corridas,
+    MAX(cor.id_corridas) AS id_corrida,
     cor.ano_corrida
 FROM {{ ref('int_historico_corrida') }} AS dc
 LEFT JOIN {{ ref('dim_corridas') }} AS cor

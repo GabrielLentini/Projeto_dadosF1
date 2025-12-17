@@ -1,0 +1,103 @@
+version: 2
+
+models:
+  - name: dim_pilotos
+    description: >
+     Dimensão de pilotos construída segundo o modelo de Kimball.
+      Esta tabela representa uma dimensão conformada, contendo atributos descritivos e
+      históricos relacionados aos pilotos da Fórmula 1. Seu objetivo é fornecer uma visão
+      consolidada e enriquecida dos pilotos, permitindo análises no contexto de um Data Warehouse
+      e suportando informações sobre corridas, temporadas, classificações e desempenho ao longo da carreira.
+
+      No modelo dimensional de Kimball, as tabelas dimensão descrevem entidades — como pessoas,
+      produtos, datas ou locais — com atributos textuais, categóricos e semânticos úteis para
+      análise. A dim_pilotos cumpre esse papel ao centralizar informações descritivas dos pilotos,
+      combinando dados de performance (como vitórias e títulos) com dados pessoais (idade,
+      nacionalidade, nome completo).
+
+      Esta dimensão utiliza uma chave substituta (id_dim_pilotos) gerada através de hashing, o que
+      segue as boas práticas de modelagem dimensional para garantir independência da chave natural e
+      estabilidade ao longo do tempo.
+
+      Lógica do Modelo:
+      A dim_pilotos integra informações de múltiplas camadas:
+        - int_dados_pilotos: métricas agregadas de performance na carreira (pontos, vitórias, pódios, etc.).
+        - int_titulos_pilotos: quantidade total de títulos identificada com base em regras históricas.
+        - stg_pilotos: dados cadastrais e identificadores naturais dos pilotos.
+      A junção desses datasets permite criar uma dimensão rica e completa sobre pilotos e suas carreiras na Fórmula 1.
+columns:
+  - name: id_dim_pilotos
+    description: "Identificador único da dimensão."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+      - unique:
+          tags: ["generic", "unique"]          
+  - name: id_piloto
+    description: "Identificador único do piloto."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: nome_piloto
+    description: "Nome completo do piloto."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: abreviacao_piloto
+    description: "Abreviação oficial utilizada para o piloto nas corridas."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: pontos_totais_carreira
+    description: "Total de pontos acumulados pelo piloto ao longo de sua carreira."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: titulos
+    description: "Quantidade total de campeonatos conquistados pelo piloto."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+      - dbt_expectations.expect_column_values_to_be_between:
+          max_value: 8
+  - name: vitorias
+    description: "Número total de vitórias do piloto."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+      - dbt_expectations.expect_column_values_to_be_between:
+          max_value: 106
+  - name: podios
+    description: "Número total de vezes que o piloto terminou em 1º, 2º ou 3º lugar."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+      - dbt_expectations.expect_column_values_to_be_between:
+          max_value: 203
+  - name: pole_positions
+    description: "Quantidade de pole positions conquistadas ao longo da carreira."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+      - dbt_expectations.expect_column_values_to_be_between:
+          max_value: 105
+  - name: largadas_top10
+    description: "Número de corridas em que o piloto largou dentro das 10 primeiras posições."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: largadas_fora_top10
+    description: "Número de corridas em que o piloto largou em posições superiores a 10."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: nacionalidade_piloto
+    description: "Nacionalidade do piloto."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]
+  - name: data_nascimento_piloto
+    description: "Data de nascimento do piloto."
+    data_tests:
+      - not_null:
+          tags: ["generic", "null"]

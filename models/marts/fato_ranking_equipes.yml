@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: fato_ranking_equipes
+    tags: ["estatisticas", "resultados"]
+    description: >
+      O que é a tabela fato_ranking_equipes?
+      A tabela fato_ranking_equipes representa uma fato do modelo dimensional de Kimball, armazenando informações sobre o desempenho das equipes de Fórmula 1.
+      No modelo de Kimball, uma tabela fato registra eventos mensuráveis associados a um grão específico, além de chaves que a relacionam com dimensões.
+      Essa tabela consolida métricas essenciais de performance das equipes, permitindo análises comparativas entre construtoras e estudos históricos sobre
+      seus resultados ao longo das temporadas.
+
+      Finalidade da tabela
+      A tabela fato_ranking_equipes tem como objetivo centralizar as estatísticas principais de cada equipe, como vitórias, pódios e pole positions, vinculadas
+      a uma dimensão descritiva (dim_equipes). Ela possibilita análises como: comparar o desempenho de equipes ao longo do tempo, identificar dominância de construtoras
+      e medir impacto de temporadas específicas.
+
+      Quais são as colunas e por que elas são retornadas?
+      id_fato_ranking_equipe
+      É a chave substituta (surrogate key) da fato, gerada por dbt_utils.generate_surrogate_key a partir da combinação entre dim.id_dim_equipes e int_de.id_equipe.
+      Essa chave garante unicidade e independência de chaves naturais, representando de forma única o evento “performance consolidada da equipe”.
+
+      id_dim_equipes
+      É a chave estrangeira que relaciona a fato à dimensão dim_equipes, onde estão os atributos descritivos, como nome, país, motor, cores, histórico e demais
+      informações que caracterizam a equipe. Essa coluna é essencial para conectar métricas ao contexto descritivo.
+
+      vitorias, podios, pole_positions
+      São as métricas principais da tabela. Esses valores representam o desempenho esportivo da equipe e constituem o núcleo da análise quantitativa.
+
+      Por que apenas essas colunas são retornadas?
+      A tabela traz somente o necessário para uma fato bem definida, evitando redundância e mantendo aderência ao modelo dimensional.
+
+    columns:
+      - name: id_ranking_equipe
+        description: "Identificador único da fato."
+        data_tests:
+          - unique:
+              tags: ["generic", "unique"]
+          - not_null:
+              tags: ["generic", "null"]
+      - name: vitorias
+        description: "Número de vitórias da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: podios
+        description: "Número de pódios da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+        description: "Número de pole positions da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

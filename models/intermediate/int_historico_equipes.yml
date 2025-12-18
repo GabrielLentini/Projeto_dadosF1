@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: int_historico_equipes
+    description: "Tabela intermediária que consolida as estatísticas gerais de desempenho de cada equipe ao longo de todas as corridas registradas. O modelo soma os pontos 
+     obtidos tanto em corridas principais quanto em corridas sprint e calcula diversas métricas de performance, incluindo vitórias, pódios, pole positions e padrões de largada. 
+     Cada linha representa uma equipe, trazendo um resumo completo de seu histórico competitivo na tabela. No código, realizamos um GROUP BY utilizando o campo id_equipe, 
+     garantindo que todas as informações sejam consolidadas por equipe. Para calcular a pontuação total, utilizamos a função SUM, somando os pontos da corrida principal e da 
+     sprint, com COALESCE para evitar valores nulos. Além disso, são utilizadas múltiplas expressões COUNT(*) FILTER (...) para contabilizar ocorrências específicas, como 
+     vitórias, pódios, poles e largadas dentro ou fora do top 10, sempre de acordo com as condições definidas em cada cláusula FILTER."
+    columns:
+      - name: id_equipe
+        description: "Identificador único da equipe"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]
+      - name: vitorias
+        description: "Número total de vitórias da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: podios
+        description: "Número total de pódios da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: pole_positions
+        description: "Quantidade de pole positions da equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: largadas_top10
+        description: "Número de vezes que a equipe largou dentro do top 10."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: largadas_fora_top10
+        description: "Quantidade de vezes que a equipe largou fora do top 10."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

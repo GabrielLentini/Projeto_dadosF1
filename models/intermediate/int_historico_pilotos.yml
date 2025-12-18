@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: int_historico_pilotos
+    description: "Tabela intermediária que consolida as estatísticas gerais da carreira de cada piloto.
+      O modelo agrega pontos obtidos em corridas e sprints, além de computar métricas de desempenho
+      como vitórias, pódios, pole positions e posições de largada. Cada linha representa um piloto,
+      contendo o resumo de sua performance em todas as corridas registradas no dataset. No código nós
+      fazemos um group by utilizando o id_piloto, agrupando as informações por piloto. Para somarmos tanto
+      os pontos utilizados em corrida sprint quanto em corridas principais utilizamos a função SUM, com coalesce
+      para evitar que fique como NULL. Também é utilizada algumas vezes a função COUNT, para contarmos os valores
+      baseado no que está dentro do filtro determinado em filter."
+    columns:
+      - name: id_piloto
+        description: "Identificador único do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]
+      - name: pontos_totais_carreira      
+        description: "Soma total dos pontos conquistados pelo piloto em toda a carreira."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: vitorias
+        description: "Número total de vitórias do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 106
+      - name: podios
+        description: "Número total de pódios do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 203
+      - name: pole_positions
+        description: "Quantidade de pole positions do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: largadas_top10
+        description: "Número de vezes que o piloto largou dentro do top 10."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: largadas_fora_top10
+        description: "Quantidade de vezes que o piloto largou fora do top 10."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

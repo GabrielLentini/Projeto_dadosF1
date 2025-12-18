@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: int_status
+    description: "Nessa tabela é retornado em formato json todos os status que um piloto teve em um ano. Os status são retornados dessa forma para ser fácil de 
+     analisa-los como um todo, podendo ter uma boa visão geral da temporada e um dos possíveis motivos de um piloto ter performado melhor que outro."
+    columns:
+      - name: id_piloto
+        description: "Identificador único do piloto"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+              config:
+                severity: warn
+                warn_if: ">0"
+                error_if: ">1"
+      - name: ano
+        description: "Ano em que foram agrupados os dados"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+              config:
+                severity: warn
+                warn_if: ">0"
+                error_if: ">1"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1950
+              max_value: 2024
+      - name: status_piloto_ano
+        description: "Todos diferentes status que o piloto teve na temporada"

@@ -9,7 +9,7 @@ SELECT
     CONCAT(pil.primeiro_nome_piloto, ' ', pil.sobrenome_piloto) AS nome_piloto,
     pil.abreviacao_piloto,
     dp.pontos_totais_carreira,
-    tp.titulos,
+    COALESCE(tp.titulos, 0) AS titulos,
     dp.vitorias,
     dp.podios,
     dp.pole_positions,

@@ -26,7 +26,7 @@ models:
       granularidade única por equipe, refletindo tanto atributos fixos (como nome e nacionalidade) quanto indicadores acumulados de desempenho.
 
     columns:
-      - name: id_dim_equipes
+      - name: id_equipes
         description: "Identificador único da dimensão."
         data_tests:
           - not_null:

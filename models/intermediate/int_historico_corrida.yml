@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: int_historico_corrida
+    description: "Tabela intermediária que consolida o resultado final de cada corrida, trazendo de forma estruturada os pilotos que compuseram o pódio e o piloto que largou
+      na pole position. Cada linha representa uma única corrida, identificada por id_corrida, permitindo consultar rapidamente os principais destaques daquele evento. A 
+      construção do modelo é dividida em duas etapas: a CTE pole_position identifica, para cada corrida, qual piloto largou na pole position, filtrando as linhas onde 
+      posicao_largada = 1 e obtendo o nome correspondente por meio de um MAX(nome_piloto) para garantir um único valor por corrida. Em seguida, a CTE podio monta o pódio 
+      utilizando expressões condicionais (CASE WHEN) que extraem o nome do piloto conforme sua posição final (1º, 2º ou 3º), novamente aplicando MAX para consolidar uma linha por 
+      corrida. A consulta final realiza um LEFT JOIN entre as duas CTEs, unificando o pódio e a pole position em uma única estrutura por corrida."
+    columns:
+      - name: id_corrida
+        description: "Identificador único da corrida"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]
+      - name: primeiro_colocado
+        description: "Nome do vencedor da corrida"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: segundo_colocado
+        description: "Nome do segundo colocado"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+              config:
+                severity: warn
+                warn_if: ">0"
+                error_if: ">1"
+      - name: terceiro_colocado
+        description: "Nome do terceiro colocado"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: piloto_pole_position
+        description: "Nome do piloto que marcou a pole position da corrida. (Largou em primeiro)"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

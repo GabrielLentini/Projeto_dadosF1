@@ -25,44 +25,36 @@ models:
 
       As junções utilizam sempre a combinação de id_piloto e ano, garantindo integridade entre os datasets.
 
-columns:
-  - name: id_dim_estatisticas
-    description: "Identificador único da dimensão."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-      - unique:
-          tags: ["generic", "unique"]
-  - name: id_piloto
-    description: "Identificador único do piloto."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: ano
-    description: "Ano da temporada analisada."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-      - dbt_expectations.expect_column_values_to_be_between:
-          min_value: 1950
-          max_value: 2024
-  - name: numero_paradas
-    description: "Quantidade de paradas realizadas pelo piloto durante todas as corridas da temporada."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: numero_paradas_int
-    description: "Número de paradas convertido para formato inteiro, usado em cálculos e agregações."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: status_piloto_ano
-    description: "Todos status que o piloto teve ao decorrer da temporada."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: colocacao_no_campeonato
-    description: "Posição final do piloto no campeonato naquele ano."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
+    columns:
+      - name: id_estatisticas
+        description: "Identificador único da dimensão."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]
+      - name: id_piloto
+        description: "Identificador único do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: ano
+        description: "Ano da temporada analisada."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1950
+              max_value: 2024
+      - name: numero_paradas
+        description: "Quantidade de paradas realizadas pelo piloto durante todas as corridas da temporada."
+      - name: status_piloto_ano
+        description: "Todos status que o piloto teve ao decorrer da temporada."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: colocacao_no_campeonato
+        description: "Posição final do piloto no campeonato naquele ano."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

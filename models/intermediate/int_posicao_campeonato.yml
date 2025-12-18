@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: int_posicao_campeonato
+    description: "A tabela apresenta a classificação final de cada piloto em todas as temporadas, aplicando corretamente as regras históricas de pontuação da Fórmula 1. O objetivo
+     é refletir a posição oficial de cada piloto em cada campeonato, considerando os diferentes sistemas de descarte de resultados utilizados entre as décadas de 1950 e 1990. Na 
+     primeira CTE, é calculada a pontuação individual de cada corrida, somando os pontos obtidos nas corridas tradicionais com os pontos conquistados em corridas sprint. Em seguida, 
+     aplica-se um ROW_NUMBER() particionado por piloto e ano, ordenando as corridas da maior para a menor pontuação. Esse passo é fundamental para permitir a aplicação do sistema de
+     descartes adotado pela Fórmula 1 antes de 1991, quando apenas os melhores resultados do piloto eram considerados para a pontuação final da temporada. Na segunda CTE, são somadas 
+     apenas as pontuações válidas de cada piloto em cada ano. Para temporadas até 1990, apenas os 11 melhores resultados são considerados; esse comportamento é implementado filtrando 
+     apenas as linhas onde rn <= 11. A partir de 1991, todos os resultados passam a valer, eliminando a necessidade de qualquer filtro adicional. O resultado dessa etapa é a pontuação 
+     final do piloto na temporada, já compatível com o regulamento vigente da época. Por fim, na consulta principal, é atribuída a colocação de cada piloto no campeonato. Isso é feito 
+     por meio de outro ROW_NUMBER(), agora particionado por ano e ordenado pela pontuação anual em ordem decrescente. O valor resultante representa a posição final do piloto no 
+     campeonato daquele ano, com 1 indicando o campeão e os demais números representando as posições subsequentes."
+    columns:
+      - name: id_piloto
+        description: "Identificador único do piloto"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: ano
+        description: "Ano da temporada"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1950
+              max_value: 2024
+      - name: pontos_no_ano
+        description: "Quantidade de pontos marcados pelo piloto na temporada"
+      - name: colocacao_no_campeonato
+        description: "Posição que o piloto terminou o campeonato"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

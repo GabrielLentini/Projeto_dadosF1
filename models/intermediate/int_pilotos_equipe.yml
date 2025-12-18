@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: int_pilotos_equipe
+    description: "Nessa tabela é retornado o nome de todos os pilotos que já passaram por uma equipe em formato json. Podemos identificar qual a equipe pelo id_equipe. Para criar a 
+     estrutura é utilizada as funções JSONB_BUILD_OBJECT que é utilizada para criar objetos JSON diretamente a partir de pares chave-valor informados na chamada da função. Após 
+     isso é utilizada a função JSONB_AGG que pega todas as linhas do valor informado e transforma em um array JSONB. E por último é utilizada a função JSONB_BUILD_OBJECT que 
+     cria um objeto JSONB a partir de pares chave-valor. Dessa forma conseguimos retornar em estrutura JSON todos os pilotos que já pilotaram pela equipe em alguma corrida."
+    columns:
+      - name: id_equipe
+        description: "Identificador único da equipe"
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]
+      - name: pilotos_da_equipe
+        description: "Retorna o nome de todos pilotos que em algum momento correram alguma corrida pela equipe."              

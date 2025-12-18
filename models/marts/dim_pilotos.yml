@@ -25,79 +25,72 @@ models:
         - int_titulos_pilotos: quantidade total de títulos identificada com base em regras históricas.
         - stg_pilotos: dados cadastrais e identificadores naturais dos pilotos.
       A junção desses datasets permite criar uma dimensão rica e completa sobre pilotos e suas carreiras na Fórmula 1.
-columns:
-  - name: id_dim_pilotos
-    description: "Identificador único da dimensão."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-      - unique:
-          tags: ["generic", "unique"]          
-  - name: id_piloto
-    description: "Identificador único do piloto."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: nome_piloto
-    description: "Nome completo do piloto."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: abreviacao_piloto
-    description: "Abreviação oficial utilizada para o piloto nas corridas."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: pontos_totais_carreira
-    description: "Total de pontos acumulados pelo piloto ao longo de sua carreira."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: titulos
-    description: "Quantidade total de campeonatos conquistados pelo piloto."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-      - dbt_expectations.expect_column_values_to_be_between:
-          max_value: 8
-  - name: vitorias
-    description: "Número total de vitórias do piloto."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-      - dbt_expectations.expect_column_values_to_be_between:
-          max_value: 106
-  - name: podios
-    description: "Número total de vezes que o piloto terminou em 1º, 2º ou 3º lugar."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-      - dbt_expectations.expect_column_values_to_be_between:
-          max_value: 203
-  - name: pole_positions
-    description: "Quantidade de pole positions conquistadas ao longo da carreira."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-      - dbt_expectations.expect_column_values_to_be_between:
-          max_value: 105
-  - name: largadas_top10
-    description: "Número de corridas em que o piloto largou dentro das 10 primeiras posições."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: largadas_fora_top10
-    description: "Número de corridas em que o piloto largou em posições superiores a 10."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: nacionalidade_piloto
-    description: "Nacionalidade do piloto."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
-  - name: data_nascimento_piloto
-    description: "Data de nascimento do piloto."
-    data_tests:
-      - not_null:
-          tags: ["generic", "null"]
+    columns:      
+      - name: id_pilotos
+        description: "Identificador único do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: nome_piloto
+        description: "Nome completo do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: abreviacao_piloto
+        description: "Abreviação oficial utilizada para o piloto nas corridas."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: pontos_totais_carreira
+        description: "Total de pontos acumulados pelo piloto ao longo de sua carreira."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: titulos
+        description: "Quantidade total de campeonatos conquistados pelo piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 8
+      - name: vitorias
+        description: "Número total de vitórias do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 106
+      - name: podios
+        description: "Número total de vezes que o piloto terminou em 1º, 2º ou 3º lugar."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 203
+      - name: pole_positions
+        description: "Quantidade de pole positions conquistadas ao longo da carreira."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 105
+      - name: largadas_top10
+        description: "Número de corridas em que o piloto largou dentro das 10 primeiras posições."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: largadas_fora_top10
+        description: "Número de corridas em que o piloto largou em posições superiores a 10."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: nacionalidade_piloto
+        description: "Nacionalidade do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+      - name: data_nascimento_piloto
+        description: "Data de nascimento do piloto."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]

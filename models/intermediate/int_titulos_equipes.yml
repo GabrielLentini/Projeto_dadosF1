@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: int_titulos_equipes
+    description: "Este modelo consolida a quantidade total de títulos oficiais de construtores(equipes) da Fórmula 1.
+
+      Diferente de modelos calculados a partir de resultados de corridas, este modelo utiliza uma tabela
+      estática com os títulos oficiais históricos de cada equipe, conforme registros consolidados
+      da Fórmula 1. O objetivo é garantir consistência histórica e evitar divergências causadas por mudanças
+      de nomenclatura, fusões de equipes ou particularidades de determinadas temporadas.
+
+      Lógica geral do modelo
+      O modelo é estruturado em duas etapas principais:
+
+      1. Definição dos títulos oficiais
+      É criada uma CTE (`titulos_oficiais`) utilizando a cláusula VALUES, que contém o nome oficial da equipe
+      conforme registrado historicamente na Fórmula 1 e a respectiva quantidade de títulos conquistados.
+      Essa abordagem garante controle total sobre os valores utilizados e evita dependência de cálculos
+      complexos ou regras históricas de pontuação para construtores.
+
+      2. Associação com a base de construtores
+      Os nomes oficiais das equipes definidos na CTE são associados à tabela de construtores (`stg_construtores`)
+      por meio de um LEFT JOIN utilizando o campo `nome_equipe`.
+      A partir dessa associação, é possível obter o `id_equipe`, que representa o identificador único interno
+      de cada construtor no modelo de dados.
+
+      O uso do LEFT JOIN garante que todos os títulos oficiais sejam preservados, mesmo em cenários onde
+      alguma equipe não esteja completamente mapeada na tabela de staging.
+
+      A tabela final contém uma linha por equipe, com seu identificador único (`id_equipe`) e a quantidade
+      total de títulos oficiais de construtores conquistados na Fórmula 1."
+    columns:
+      - name: id_equipe
+        description: "Identificador único da equipe (construtor) no modelo de dados."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - unique:
+              tags: ["generic", "unique"]
+      - name: titulos
+        description: "Quantidade total de títulos oficiais de construtores conquistados pela equipe."
+        data_tests:
+          - not_null:
+              tags: ["generic", "null"]
+          - dbt_expectations.expect_column_values_to_be_between:
+              max_value: 16

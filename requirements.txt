@@ -1,6 +1,14 @@
+# Required for dbt and Elementary:
 dbt-core==1.8.8
 dbt-postgres==1.8.2
 elementary-data[postgres]==0.16.1
 sqlfluff==3.0.7
 sqlfluff-templater-dbt==3.0.7
 setuptools==80.9.0
+
+# Required for API:
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+python-dotenv
